@@ -23,7 +23,7 @@ exports.postOneProject = (request, response) => {
     title: request.body.title,
     description: request.body.description,
     objective: request.body.objective,
-    userId: request.user.userId,
+    projectUserId: request.user.userId,
     observers: request.body.observers,
     userImage: request.user.imageUrl,
     createdAt: new Date().toISOString(),
@@ -166,7 +166,7 @@ exports.deleteProject = (request, response) => {
       if (!doc.exists) {
         return response.status(404).json({ error: "Project not found" });
       }
-      if (doc.data().userId !== request.user.userId) {
+      if (doc.data().projectUserId !== request.user.userId) {
         return response.status(403).json({ error: "Unauthorized" });
       } else {
         return document.delete();
