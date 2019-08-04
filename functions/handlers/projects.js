@@ -39,7 +39,7 @@ exports.postOneProject = (request, response) => {
     .then(doc => {
       const resProject = newProject;
       resProject.projectId = doc.id;
-      response.json({ resProject });
+      response.json(resProject);
     })
     .catch(err => {
       response.status(500).json({ error: "something went wrong" });

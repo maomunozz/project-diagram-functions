@@ -16,7 +16,8 @@ const {
   login,
   uploadImage,
   addUserDetails,
-  getAuthenticatedUser
+  getAuthenticatedUser,
+  getObservers
 } = require("./handlers/users");
 
 //Project routes
@@ -33,6 +34,7 @@ app.post("/login", login);
 app.post("/user/image", FBAuth, uploadImage);
 app.post("/user", FBAuth, addUserDetails);
 app.get("/user", FBAuth, getAuthenticatedUser);
+app.get("/observers", FBAuth, getObservers);
 
 exports.api = functions.https.onRequest(app);
 

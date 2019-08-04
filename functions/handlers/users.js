@@ -51,7 +51,7 @@ exports.signup = (request, response) => {
         lastName: newUser.lastName,
         profession: newUser.profession,
         email: newUser.email,
-        createAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         imageUrl: `https://firebasestorage.googleapis.com/v0/b/${
           config.storageBucket
         }/o/${noImg}?alt=media`
@@ -181,4 +181,24 @@ exports.uploadImage = (request, response) => {
       });
   });
   busboy.end(request.rawBody);
+};
+
+exports.getObservers = (request, response) => {
+  db.collection("users")
+    .orderBy("createdAt", "desc")
+    .get()
+    .then(data => {
+      let observers = [];
+      data.forEach(doc => {
+        if (request.user.userId !== doc.id) {
+          observers.push({
+            userId: doc.id,
+            ...doc.data()
+          });
+        }
+      });
+
+      return response.json(observers);
+    })
+    .catch(err => console.error(err));
 };
