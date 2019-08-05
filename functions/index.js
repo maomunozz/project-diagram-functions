@@ -17,13 +17,14 @@ const {
   uploadImage,
   addUserDetails,
   getAuthenticatedUser,
-  getObservers
+  getObservers,
+  signupWithGoogle
 } = require("./handlers/users");
 
 //Project routes
-app.get("/projects", getAllProjects);
+app.get("/projects", FBAuth, getAllProjects);
 app.post("/project", FBAuth, postOneProject);
-app.get("/project/:projectId", getProject);
+app.get("/project/:projectId", FBAuth, getProject);
 app.post("/project/:projectId/comment", FBAuth, commentOnProject);
 app.delete("/project/:projectId", FBAuth, deleteProject);
 app.post("/project/:projectId/diagram", FBAuth, diagramProject);
@@ -35,6 +36,7 @@ app.post("/user/image", FBAuth, uploadImage);
 app.post("/user", FBAuth, addUserDetails);
 app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/observers", FBAuth, getObservers);
+app.post("/signup/google", signupWithGoogle);
 
 exports.api = functions.https.onRequest(app);
 
