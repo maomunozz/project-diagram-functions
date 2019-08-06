@@ -26,6 +26,8 @@ exports.postOneProject = (request, response) => {
     projectUserId: request.user.userId,
     observers: request.body.observers,
     userImage: request.user.imageUrl,
+    firstNameUser: request.user.firstNameUser,
+    lastNameUser: request.user.lastNameUser,
     createdAt: new Date().toISOString(),
     commentCount: 0
   };
@@ -90,7 +92,7 @@ exports.getProject = (request, response) => {
         //projectData.diagrams.push(doc.data());
         projectData.comments.push(doc.data());
       });
-      return response.json({ projectData });
+      return response.json(projectData);
     })
     .catch(err => {
       console.error(err);

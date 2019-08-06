@@ -27,6 +27,8 @@ module.exports = (request, response, next) => {
     .then(data => {
       request.user.userId = data.docs[0].data().userId;
       request.user.imageUrl = data.docs[0].data().imageUrl;
+      request.user.firstNameUser = data.docs[0].data().firstName;
+      request.user.lastNameUser = data.docs[0].data().lastName;
       return next();
     })
     .catch(err => {
