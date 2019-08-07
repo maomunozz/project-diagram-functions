@@ -74,31 +74,14 @@ exports.signup = (request, response) => {
 };
 
 exports.signupWithGoogle = (request, response) => {
-  // var credential = firebase.auth.GoogleAuthProvider.credential(
-  //   null,
-  //   request.body.idToken
-  // );
-  // //console.error(request.body);
-  // firebase
-  //   .auth()
-  //   .signInWithCredential(credential)
-  //   .catch(err => {
-  //     console.error(err);
-  //     return response.status(500).json({ error: err.code });
-  //   });
-
   let token, userId;
-  db.doc(`/users/${request.body.email}`)
-    .get()
-    .then(doc => {
-      if (!doc.exists) {
-        const credential = firebase.auth.GoogleAuthProvider.credential(
-          null,
-          request.body.idToken
-        );
-        return firebase.auth().signInWithCredential(credential);
-      }
-    })
+  const credential = firebase.auth.GoogleAuthProvider.credential(
+    null,
+    request.body.idToken
+  );
+  firebase
+    .auth()
+    .signInWithCredential(credential)
     .then(data => {
       userId = data.user.uid;
       return data.user.getIdToken();
@@ -113,7 +96,16 @@ exports.signupWithGoogle = (request, response) => {
         createdAt: new Date().toISOString(),
         imageUrl: request.body.imageUrl
       };
-      return db.doc(`/users/${userId}`).set(userCredentials);
+      db.doc(`/users/${userId}`)
+        .get()
+        .then(doc => {
+          if (!doc.exists) {
+            return db.doc(`/users/${userId}`).set(userCredentials);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        });
     })
     .then(() => {
       return response.status(201).json({ token });
@@ -121,8 +113,8 @@ exports.signupWithGoogle = (request, response) => {
     .catch(err => {
       console.error(err);
       return response
-        .status(500)
-        .json({ general: "Something went wrong, please try again" });
+        .status(403)
+        .json({ general: "Wrong credentials, please try again " });
     });
 };
 
