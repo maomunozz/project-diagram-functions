@@ -1,5 +1,8 @@
 const { db } = require("../util/admin");
-const { validateCreateProject } = require("../util/validators");
+const {
+  validateCreateProject,
+  reduceProjectDetails
+} = require("../util/validators");
 
 exports.getAllProjects = (request, response) => {
   db.collection("projects")
@@ -176,6 +179,36 @@ exports.deleteProject = (request, response) => {
     })
     .then(() => {
       response.json({ message: "Project deleted successfully" });
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
+};
+
+exports.editProjectDetails = (request, response) => {
+  let projectDetailsRequest = {
+    title: request.body.title,
+    description: request.body.description,
+    objective: request.body.objective
+  };
+
+  let projectDetails = reduceProjectDetails(projectDetailsRequest);
+  const document = db.doc(`/projects/${request.body.projectId}`);
+  document
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return response.status(404).json({ error: "Project not found" });
+      }
+      if (doc.data().projectUserId !== request.user.userId) {
+        return response.status(403).json({ error: "Unauthorized" });
+      } else {
+        return document.update(projectDetails);
+      }
+    })
+    .then(() => {
+      response.json({ message: "Details added successfully" });
     })
     .catch(err => {
       console.error(err);

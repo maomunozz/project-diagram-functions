@@ -65,3 +65,15 @@ exports.reduceUserDetails = data => {
 
   return userDetails;
 };
+
+exports.reduceProjectDetails = data => {
+  let projectDetails = {};
+
+  if (!isEmpty(data.title.trim())) projectDetails.title = data.title;
+  if (!isEmpty(data.description.trim()))
+    projectDetails.description = data.description;
+  if (!isEmpty(data.objective.trim()))
+    projectDetails.objective = data.objective;
+
+  return projectDetails;
+};
