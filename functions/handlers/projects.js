@@ -77,7 +77,9 @@ exports.getProject = (request, response) => {
       projectData.diagrams = [];
       data.forEach(doc => {
         //projectData.comments.push(doc.data());
-        projectData.diagrams.push(doc.data());
+        let diagram = doc.data();
+        diagram.diagramId = doc.id;
+        projectData.diagrams.push(diagram);
       });
       //return response.json({ projectData });
       return (
