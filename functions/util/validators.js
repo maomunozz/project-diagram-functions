@@ -77,3 +77,15 @@ exports.reduceProjectDetails = data => {
 
   return projectDetails;
 };
+
+exports.validateCreateDiagram = data => {
+  let errors = {};
+
+  if (isEmpty(data.diagramName)) errors.diagramName = "Must not be empty";
+  if (isEmpty(data.type)) errors.type = "Must not be empty";
+
+  return {
+    errors,
+    valid: Object.keys(errors).length === 0 ? true : false
+  };
+};

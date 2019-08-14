@@ -1,7 +1,8 @@
 const { db } = require("../util/admin");
 const {
   validateCreateProject,
-  reduceProjectDetails
+  reduceProjectDetails,
+  validateCreateDiagram
 } = require("../util/validators");
 
 exports.getAllProjects = (request, response) => {
@@ -139,10 +140,15 @@ exports.commentOnProject = (request, response) => {
 exports.diagramProject = (request, response) => {
   const newDiagram = {
     diagram: request.body.diagram,
+    diagramName: request.body.diagramName,
+    type: request.body.type,
     createdAt: new Date().toISOString(),
-    projectId: request.params.projectId,
-    type: request.body.type
+    projectId: request.params.projectId
   };
+
+  const { valid, errors } = validateCreateDiagram(newDiagram);
+
+  if (!valid) return response.status(400).json(errors);
 
   db.doc(`/projects/${request.params.projectId}`)
     .get()
