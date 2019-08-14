@@ -145,7 +145,8 @@ exports.diagramProject = (request, response) => {
     diagramName: request.body.diagramName,
     type: request.body.type,
     createdAt: new Date().toISOString(),
-    projectId: request.params.projectId
+    projectId: request.params.projectId,
+    diagramUserId: request.user.userId
   };
 
   const { valid, errors } = validateCreateDiagram(newDiagram);
@@ -162,8 +163,10 @@ exports.diagramProject = (request, response) => {
     .then(() => {
       return db.collection("diagrams").add(newDiagram);
     })
-    .then(() => {
-      response.json(newDiagram);
+    .then(doc => {
+      const resDiagram = newDiagram;
+      resDiagram.diagramId = doc.id;
+      response.json(resDiagram);
     })
     .catch(err => {
       console.log(err);
@@ -217,6 +220,29 @@ exports.editProjectDetails = (request, response) => {
     })
     .then(() => {
       response.json({ message: "Details added successfully" });
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
+};
+
+exports.deleteDiagram = (request, response) => {
+  const document = db.doc(`/diagrams/${request.params.diagramId}`);
+  document
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return response.status(404).json({ error: "Diagram not found" });
+      }
+      if (doc.data().diagramUserId !== request.user.userId) {
+        return response.status(403).json({ error: "Unauthorized" });
+      } else {
+        return document.delete();
+      }
+    })
+    .then(() => {
+      response.json({ message: "Diagram deleted successfully" });
     })
     .catch(err => {
       console.error(err);
