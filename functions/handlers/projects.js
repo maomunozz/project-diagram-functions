@@ -249,3 +249,30 @@ exports.deleteDiagram = (request, response) => {
       return response.status(500).json({ error: err.code });
     });
 };
+
+exports.saveDiagram = (request, response) => {
+  let diagram = {
+    diagram: request.body.diagram
+  };
+
+  const document = db.doc(`/diagrams/${request.params.diagramId}`);
+  document
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return response.status(404).json({ error: "Diagram not found" });
+      }
+      if (doc.data().diagramUserId !== request.user.userId) {
+        return response.status(403).json({ error: "Unauthorized" });
+      } else {
+        return document.update(diagram);
+      }
+    })
+    .then(() => {
+      response.json({ message: "Diagram update successfully" });
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
+};

@@ -11,7 +11,8 @@ const {
   deleteProject,
   diagramProject,
   editProjectDetails,
-  deleteDiagram
+  deleteDiagram,
+  saveDiagram
 } = require("./handlers/projects");
 const {
   signup,
@@ -32,6 +33,7 @@ app.delete("/project/:projectId", FBAuth, deleteProject);
 app.post("/project/:projectId/diagram", FBAuth, diagramProject);
 app.post("/project/edit", FBAuth, editProjectDetails);
 app.delete("/project/:projectId/diagram/:diagramId", FBAuth, deleteDiagram);
+app.post("/project/:projectId/diagram/:diagramId", FBAuth, saveDiagram);
 
 //Users routes
 app.post("/signup", signup);
