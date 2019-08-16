@@ -276,3 +276,22 @@ exports.saveDiagram = (request, response) => {
       return response.status(500).json({ error: err.code });
     });
 };
+
+exports.getDiagram = (request, response) => {
+  let diagramData = {};
+  db.doc(`/diagrams/${request.params.diagramId}`)
+    .get()
+    .then(doc => {
+      if (!doc.exists) {
+        return response.status(404).json({ error: "Diagram not found" });
+      } else {
+        diagramData = doc.data();
+        diagramData.diagramId = doc.id;
+        return response.json(diagramData);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      response.status(500).json({ error: err.code });
+    });
+};
