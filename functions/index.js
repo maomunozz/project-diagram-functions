@@ -1,13 +1,17 @@
 const functions = require("firebase-functions");
 const app = require("express")();
 const FBAuth = require("./util/fbAuth");
+
+const cors = require("cors");
+app.use(cors());
+
 const { db } = require("./util/admin");
 
 const {
   getAllProjects,
   postOneProject,
   getProject,
-  commentOnProject,
+  commentOnDiagram,
   deleteProject,
   diagramProject,
   editProjectDetails,
@@ -29,7 +33,11 @@ const {
 app.get("/projects", FBAuth, getAllProjects);
 app.post("/project", FBAuth, postOneProject);
 app.get("/project/:projectId", FBAuth, getProject);
-app.post("/project/:projectId/comment", FBAuth, commentOnProject);
+app.post(
+  "/project/:projectId/diagram/:diagramId/comment",
+  FBAuth,
+  commentOnDiagram
+);
 app.delete("/project/:projectId", FBAuth, deleteProject);
 app.post("/project/:projectId/diagram", FBAuth, diagramProject);
 app.post("/project/edit", FBAuth, editProjectDetails);
@@ -76,22 +84,33 @@ exports.onProjectDelete = functions.firestore
     const projectId = context.params.projectId;
     const batch = db.batch();
     return db
-      .collection("comments")
+      .collection("diagrams")
       .where("projectId", "==", projectId)
       .get()
       .then(data => {
         data.forEach(doc => {
-          batch.delete(db.doc(`/comments/${doc.id}`));
+          batch.delete(db.doc(`/diagrams/${doc.id}`));
         });
-        //return batch.commit();
-        return db
-          .collection("diagrams")
-          .where("projectId", "==", projectId)
-          .get();
+        return batch.commit();
       })
+      .catch(err => {
+        console.error(err);
+      });
+  });
+
+//trigger to delete all information asociate with one diagram
+exports.onDiagramDelete = functions.firestore
+  .document("/diagrams/{diagramId}")
+  .onDelete((snapshot, context) => {
+    const diagramId = context.params.diagramId;
+    const batch = db.batch();
+    return db
+      .collection("comments")
+      .where("diagramId", "==", diagramId)
+      .get()
       .then(data => {
         data.forEach(doc => {
-          batch.delete(db.doc(`/diagrams/${doc.id}`));
+          batch.delete(db.doc(`/comments/${doc.id}`));
         });
         return batch.commit();
       })

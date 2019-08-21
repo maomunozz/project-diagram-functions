@@ -32,8 +32,7 @@ exports.postOneProject = (request, response) => {
     userImage: request.user.imageUrl,
     firstNameUser: request.user.firstNameUser,
     lastNameUser: request.user.lastNameUser,
-    createdAt: new Date().toISOString(),
-    commentCount: 0
+    createdAt: new Date().toISOString()
   };
 
   const { valid, errors } = validateCreateProject(newProject);
@@ -63,40 +62,18 @@ exports.getProject = (request, response) => {
       }
       projectData = doc.data();
       projectData.projectId = doc.id;
-      return (
-        db
-          //.collection("comments")
-          .collection("diagrams")
-          .orderBy("createdAt", "desc")
-          .where("projectId", "==", request.params.projectId)
-          .get()
-      );
+      return db
+        .collection("diagrams")
+        .orderBy("createdAt", "desc")
+        .where("projectId", "==", request.params.projectId)
+        .get();
     })
     .then(data => {
-      //projectData.comments = [];
       projectData.diagrams = [];
       data.forEach(doc => {
-        //projectData.comments.push(doc.data());
         let diagram = doc.data();
         diagram.diagramId = doc.id;
         projectData.diagrams.push(diagram);
-      });
-      //return response.json({ projectData });
-      return (
-        db
-          //.collection("diagrams")
-          .collection("comments")
-          .orderBy("createdAt", "desc")
-          .where("projectId", "==", request.params.projectId)
-          .get()
-      );
-    })
-    .then(data => {
-      //projectData.diagrams = [];
-      projectData.comments = [];
-      data.forEach(doc => {
-        //projectData.diagrams.push(doc.data());
-        projectData.comments.push(doc.data());
       });
       return response.json(projectData);
     })
@@ -106,7 +83,7 @@ exports.getProject = (request, response) => {
     });
 };
 
-exports.commentOnProject = (request, response) => {
+exports.commentOnDiagram = (request, response) => {
   if (request.body.body.trim() === "") {
     return response.status(400).json({ comment: "Must not be empty" });
   }
@@ -114,16 +91,18 @@ exports.commentOnProject = (request, response) => {
   const newComment = {
     body: request.body.body,
     createdAt: new Date().toISOString(),
-    projectId: request.params.projectId,
+    diagramId: request.params.diagramId,
     userId: request.user.userId,
-    userImage: request.user.imageUrl
+    userImage: request.user.imageUrl,
+    firstNameUser: request.user.firstNameUser,
+    lastNameUser: request.user.lastNameUser
   };
 
-  db.doc(`/projects/${request.params.projectId}`)
+  db.doc(`/diagrams/${request.params.diagramId}`)
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Project not found" });
+        return response.status(404).json({ error: "Diagram not found" });
       }
       return doc.ref.update({ commentCount: doc.data().commentCount + 1 });
     })
@@ -146,7 +125,8 @@ exports.diagramProject = (request, response) => {
     type: request.body.type,
     createdAt: new Date().toISOString(),
     projectId: request.params.projectId,
-    diagramUserId: request.user.userId
+    diagramUserId: request.user.userId,
+    commentCount: 0
   };
 
   const { valid, errors } = validateCreateDiagram(newDiagram);
@@ -287,8 +267,21 @@ exports.getDiagram = (request, response) => {
       } else {
         diagramData = doc.data();
         diagramData.diagramId = doc.id;
-        return response.json(diagramData);
+        return db
+          .collection("comments")
+          .orderBy("createdAt", "desc")
+          .where("diagramId", "==", request.params.diagramId)
+          .get();
       }
+    })
+    .then(data => {
+      diagramData.comments = [];
+      data.forEach(doc => {
+        let comment = doc.data();
+        comment.commentId = doc.id;
+        diagramData.comments.push(comment);
+      });
+      return response.json(diagramData);
     })
     .catch(err => {
       console.error(err);
