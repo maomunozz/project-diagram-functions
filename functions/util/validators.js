@@ -62,6 +62,8 @@ exports.reduceUserDetails = data => {
   if (!isEmpty(data.profession.trim()))
     userDetails.profession = data.profession;
   if (!isEmpty(data.location.trim())) userDetails.location = data.location;
+  if (!isEmpty(data.firstName.trim())) userDetails.firstName = data.firstName;
+  if (!isEmpty(data.lastName.trim())) userDetails.lastName = data.lastName;
 
   return userDetails;
 };
