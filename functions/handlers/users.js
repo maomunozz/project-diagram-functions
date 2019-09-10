@@ -8,7 +8,8 @@ firebase.initializeApp(config);
 const {
   validateSignupData,
   validateLoginData,
-  reduceUserDetails
+  reduceUserDetails,
+  validatePasswordResetData
 } = require("../util/validators");
 
 exports.signup = (request, response) => {
@@ -52,9 +53,7 @@ exports.signup = (request, response) => {
         profession: newUser.profession,
         email: newUser.email,
         createdAt: new Date().toISOString(),
-        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${
-          config.storageBucket
-        }/o/${noImg}?alt=media`
+        imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImg}?alt=media`
       };
       return db.doc(`/users/${userId}`).set(userCredentials);
     })
@@ -212,9 +211,7 @@ exports.uploadImage = (request, response) => {
         }
       })
       .then(() => {
-        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${
-          config.storageBucket
-        }/o/${imageFileName}?alt=media`;
+        const imageUrl = `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${imageFileName}?alt=media`;
         return db.doc(`/users/${request.user.userId}`).update({ imageUrl });
       })
       .then(() => {
@@ -246,4 +243,28 @@ exports.getObservers = (request, response) => {
       return response.json(observers);
     })
     .catch(err => console.error(err));
+};
+
+exports.passwordReset = (request, response) => {
+  const passwordResetData = {
+    email: request.body.email
+  };
+
+  const { valid, errors } = validatePasswordResetData(passwordResetData);
+
+  if (!valid) return response.status(400).json(errors);
+
+  const auth = firebase.auth();
+  let emailAddress = request.body.email;
+  auth
+    .sendPasswordResetEmail(emailAddress)
+    .then(() => {
+      return response.json({
+        message: "Mensaje enviado correctamente, por favor revisa tu correo"
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
 };

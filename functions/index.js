@@ -26,7 +26,8 @@ const {
   addUserDetails,
   getAuthenticatedUser,
   getObservers,
-  signupWithGoogle
+  signupWithGoogle,
+  passwordReset
 } = require("./handlers/users");
 
 //Project routes
@@ -53,6 +54,7 @@ app.post("/user", FBAuth, addUserDetails);
 app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/observers", FBAuth, getObservers);
 app.post("/signup/google", signupWithGoogle);
+app.post("/passwordReset", passwordReset);
 
 exports.api = functions.https.onRequest(app);
 
