@@ -11,18 +11,22 @@ exports.validateSignupData = data => {
   let errors = {};
 
   if (isEmpty(data.email)) {
-    errors.email = "Must not be empty";
+    errors.email = "Este campo no debe estar vacío";
   } else if (!isEmail(data.email)) {
-    errors.email = "Must be a valid email address";
+    errors.email = "Debe ingresar una dirección de correo electrónico válida";
   }
 
-  if (isEmpty(data.password)) errors.password = "Must not be empty";
+  if (isEmpty(data.password))
+    errors.password = "Este campo no debe estar vacío";
   if (data.password !== data.confirmPassword)
     errors.confirmPassword = "Passwords must match";
 
-  if (isEmpty(data.firstName)) errors.firstName = "Must not be empty";
-  if (isEmpty(data.lastName)) errors.lastName = "Must not be empty";
-  if (isEmpty(data.profession)) errors.profession = "Must not be empty";
+  if (isEmpty(data.firstName))
+    errors.firstName = "Este campo no debe estar vacío";
+  if (isEmpty(data.lastName))
+    errors.lastName = "Este campo no debe estar vacío";
+  if (isEmpty(data.profession))
+    errors.profession = "Este campo no debe estar vacío";
 
   return {
     errors,
@@ -33,8 +37,9 @@ exports.validateSignupData = data => {
 exports.validateLoginData = data => {
   let errors = {};
 
-  if (isEmpty(data.email)) errors.email = "Must not be empty";
-  if (isEmpty(data.password)) errors.password = "Must not be empty";
+  if (isEmpty(data.email)) errors.email = "Este campo no debe estar vacío";
+  if (isEmpty(data.password))
+    errors.password = "Este campo no debe estar vacío";
 
   return {
     errors,
@@ -45,9 +50,11 @@ exports.validateLoginData = data => {
 exports.validateCreateProject = data => {
   let errors = {};
 
-  if (isEmpty(data.title)) errors.title = "Must not be empty";
-  if (isEmpty(data.description)) errors.description = "Must not be empty";
-  if (isEmpty(data.objective)) errors.objective = "Must not be empty";
+  if (isEmpty(data.title)) errors.title = "Este campo no debe estar vacío";
+  if (isEmpty(data.description))
+    errors.description = "Este campo no debe estar vacío";
+  if (isEmpty(data.objective))
+    errors.objective = "Este campo no debe estar vacío";
 
   return {
     errors,
@@ -83,8 +90,9 @@ exports.reduceProjectDetails = data => {
 exports.validateCreateDiagram = data => {
   let errors = {};
 
-  if (isEmpty(data.diagramName)) errors.diagramName = "Must not be empty";
-  if (isEmpty(data.type)) errors.type = "Must not be empty";
+  if (isEmpty(data.diagramName))
+    errors.diagramName = "Este campo no debe estar vacío";
+  if (isEmpty(data.type)) errors.type = "Este campo no debe estar vacío";
 
   return {
     errors,
@@ -96,9 +104,9 @@ exports.validatePasswordResetData = data => {
   let errors = {};
 
   if (isEmpty(data.email)) {
-    errors.email = "Must not be empty";
+    errors.email = "Este campo no debe estar vacío";
   } else if (!isEmail(data.email)) {
-    errors.email = "Must be a valid email address";
+    errors.email = "Debe ingresar una dirección de correo electrónico válida";
   }
 
   return {

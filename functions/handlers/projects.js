@@ -47,7 +47,7 @@ exports.postOneProject = (request, response) => {
       response.json(resProject);
     })
     .catch(err => {
-      response.status(500).json({ error: "something went wrong" });
+      response.status(500).json({ error: "Algo salió mal" });
       console.error(err);
     });
 };
@@ -58,7 +58,7 @@ exports.getProject = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Project not found" });
+        return response.status(404).json({ error: "Proyecto no encontrado" });
       }
       projectData = doc.data();
       projectData.projectId = doc.id;
@@ -85,7 +85,9 @@ exports.getProject = (request, response) => {
 
 exports.commentOnDiagram = (request, response) => {
   if (request.body.body.trim() === "") {
-    return response.status(400).json({ comment: "Must not be empty" });
+    return response
+      .status(400)
+      .json({ comment: "Este campo no debe estar vacío" });
   }
 
   const newComment = {
@@ -102,7 +104,7 @@ exports.commentOnDiagram = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Diagram not found" });
+        return response.status(404).json({ error: "Diagrama no encontrado" });
       }
       return doc.ref.update({ commentCount: doc.data().commentCount + 1 });
     })
@@ -114,7 +116,7 @@ exports.commentOnDiagram = (request, response) => {
     })
     .catch(err => {
       console.log(err);
-      response.status(500).json({ error: "Someting went wrong" });
+      response.status(500).json({ error: "Algo salió mal" });
     });
 };
 
@@ -137,7 +139,7 @@ exports.diagramProject = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Project not found" });
+        return response.status(404).json({ error: "Proyecto no encontrado" });
       }
     })
     .then(() => {
@@ -150,7 +152,7 @@ exports.diagramProject = (request, response) => {
     })
     .catch(err => {
       console.log(err);
-      response.status(500).json({ error: "Someting went wrong" });
+      response.status(500).json({ error: "Algo salió mal" });
     });
 };
 
@@ -160,16 +162,16 @@ exports.deleteProject = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Project not found" });
+        return response.status(404).json({ error: "Proyecto no encontrado" });
       }
       if (doc.data().projectUserId !== request.user.userId) {
-        return response.status(403).json({ error: "Unauthorized" });
+        return response.status(403).json({ error: "No autorizado" });
       } else {
         return document.delete();
       }
     })
     .then(() => {
-      response.json({ message: "Project deleted successfully" });
+      response.json({ message: "Proyecto eliminado con éxito" });
     })
     .catch(err => {
       console.error(err);
@@ -190,16 +192,16 @@ exports.editProjectDetails = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Project not found" });
+        return response.status(404).json({ error: "Proyecto no encontrado" });
       }
       if (doc.data().projectUserId !== request.user.userId) {
-        return response.status(403).json({ error: "Unauthorized" });
+        return response.status(403).json({ error: "No autorizado" });
       } else {
         return document.update(projectDetails);
       }
     })
     .then(() => {
-      response.json({ message: "Details added successfully" });
+      response.json({ message: "Detalles añadidos correctamente" });
     })
     .catch(err => {
       console.error(err);
@@ -213,16 +215,16 @@ exports.deleteDiagram = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Diagram not found" });
+        return response.status(404).json({ error: "Diagrama no encontrado" });
       }
       if (doc.data().diagramUserId !== request.user.userId) {
-        return response.status(403).json({ error: "Unauthorized" });
+        return response.status(403).json({ error: "No autorizado" });
       } else {
         return document.delete();
       }
     })
     .then(() => {
-      response.json({ message: "Diagram deleted successfully" });
+      response.json({ message: "Diagrama eliminado con éxito" });
     })
     .catch(err => {
       console.error(err);
@@ -240,16 +242,16 @@ exports.saveDiagram = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Diagram not found" });
+        return response.status(404).json({ error: "Diagrama no encontrado" });
       }
       if (doc.data().diagramUserId !== request.user.userId) {
-        return response.status(403).json({ error: "Unauthorized" });
+        return response.status(403).json({ error: "No autorizado" });
       } else {
         return document.update(diagram);
       }
     })
     .then(() => {
-      response.json({ message: "Diagram update successfully" });
+      response.json({ message: "Diagrama actualizado con éxito" });
     })
     .catch(err => {
       console.error(err);
@@ -263,7 +265,7 @@ exports.getDiagram = (request, response) => {
     .get()
     .then(doc => {
       if (!doc.exists) {
-        return response.status(404).json({ error: "Diagram not found" });
+        return response.status(404).json({ error: "Diagrama no encontrado" });
       } else {
         diagramData = doc.data();
         diagramData.diagramId = doc.id;

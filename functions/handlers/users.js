@@ -33,7 +33,9 @@ exports.signup = (request, response) => {
     .get()
     .then(doc => {
       if (doc.exists) {
-        return response.status(400).json({ email: "this email in use" });
+        return response
+          .status(400)
+          .json({ email: "este correo electrónico ya esta en uso" });
       } else {
         return firebase
           .auth()
@@ -63,11 +65,13 @@ exports.signup = (request, response) => {
     .catch(err => {
       console.error(err);
       if (err.code === "auth/email-already-in-use") {
-        return response.status(400).json({ email: "Email is already in use" });
+        return response
+          .status(400)
+          .json({ email: "este correo electrónico ya esta en uso" });
       } else {
         return response
           .status(500)
-          .json({ general: "Something went wrong, please try again" });
+          .json({ general: "Algo salió mal. Por favor, vuelva a intentarlo" });
       }
     });
 };
@@ -113,7 +117,9 @@ exports.signupWithGoogle = (request, response) => {
       console.error(err);
       return response
         .status(403)
-        .json({ general: "Wrong credentials, please try again " });
+        .json({
+          general: "Credenciales incorrectas, por favor intente nuevamente"
+        });
     });
 };
 
@@ -140,7 +146,9 @@ exports.login = (request, response) => {
       console.error(err);
       return response
         .status(403)
-        .json({ general: "Wrong credentials, please try again " });
+        .json({
+          general: "Credenciales incorrectas, por favor intente nuevamente"
+        });
     });
 };
 
@@ -150,7 +158,9 @@ exports.addUserDetails = (request, response) => {
   db.doc(`/users/${request.user.userId}`)
     .update(userDetails)
     .then(() => {
-      return response.json({ message: "Details added successfully" });
+      return response.json({
+        message: "Detalles de usuario agregados correctamente"
+      });
     })
     .catch(err => {
       console.error(err);
@@ -187,7 +197,9 @@ exports.uploadImage = (request, response) => {
 
   busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
     if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
-      return response.status(400).json({ error: "Wrong file type submited" });
+      return response
+        .status(400)
+        .json({ error: "El tipo de archivo enviado es incorrecto" });
     }
 
     const imageExtension = filename.split(".").pop();
@@ -215,7 +227,7 @@ exports.uploadImage = (request, response) => {
         return db.doc(`/users/${request.user.userId}`).update({ imageUrl });
       })
       .then(() => {
-        return response.json({ message: "Image uploaded successfully" });
+        return response.json({ message: "Imagen cargada exitosamente" });
       })
       .catch(err => {
         console.error(err);
