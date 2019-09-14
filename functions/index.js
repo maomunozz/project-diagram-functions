@@ -58,6 +58,62 @@ app.post("/passwordReset", passwordReset);
 
 exports.api = functions.https.onRequest(app);
 
+//trigger to create notification when to create a comment
+exports.createNotificationOnComment = functions.firestore
+  .document("comments/{id}")
+  .onCreate(snapshot => {
+    db.doc(`/diagrams/${snapshot.data().diagramId}`)
+      .get()
+      .then(doc => {
+        if (doc.exists && doc.data().diagramUserId !== snapshot.data().userId) {
+          return db.doc(`/notifications/${snapshot.id}`).set({
+            createdAt: new Date().toISOString(),
+            recipient: doc.data().diagramUserId,
+            sender: snapshot.data().userId,
+            type: "comment",
+            read: false,
+            projectDiagramId: doc.id
+          });
+        }
+      })
+      .then(() => {
+        return;
+      })
+      .catch(err => {
+        console.error(err);
+        return;
+      });
+  });
+
+//trigger to create notification when to create a new project
+exports.createNotificationOnProject = functions.firestore
+  .document("projects/{id}")
+  .onCreate(snapshot => {
+    db.doc(`/projects/${snapshot.id}`)
+      .get()
+      .then(doc => {
+        if (doc.exists && doc.data().observers.length > 0) {
+          doc.data().observers.forEach(observer => {
+            return db.collection("notifications").add({
+              createdAt: new Date().toISOString(),
+              recipient: observer,
+              sender: snapshot.data().projectUserId,
+              type: "observer",
+              read: false,
+              projectDiagramId: doc.id
+            });
+          });
+        }
+      })
+      .then(() => {
+        return;
+      })
+      .catch(err => {
+        console.error(err);
+        return;
+      });
+  });
+
 //trigger to change the userImage in all projects
 exports.onUserImageChange = functions.firestore
   .document("/users/{userId}")

@@ -115,11 +115,9 @@ exports.signupWithGoogle = (request, response) => {
     })
     .catch(err => {
       console.error(err);
-      return response
-        .status(403)
-        .json({
-          general: "Credenciales incorrectas, por favor intente nuevamente"
-        });
+      return response.status(403).json({
+        general: "Credenciales incorrectas, por favor intente nuevamente"
+      });
     });
 };
 
@@ -144,13 +142,14 @@ exports.login = (request, response) => {
     })
     .catch(err => {
       console.error(err);
-      return response
-        .status(403)
-        .json({
-          general: "Credenciales incorrectas, por favor intente nuevamente"
-        });
+      return response.status(403).json({
+        general:
+          "Email o password son incorrectos, por favor intente nuevamente"
+      });
     });
 };
+
+exports.newToken = (request, response) => {};
 
 exports.addUserDetails = (request, response) => {
   let userDetails = reduceUserDetails(request.body);
@@ -175,8 +174,29 @@ exports.getAuthenticatedUser = (request, response) => {
     .then(doc => {
       if (doc.exists) {
         userData.credentials = doc.data();
-        return response.json(userData);
+        //return response.json(userData);
+        return db
+          .collection("notifications")
+          .where("recipient", "==", request.user.userId)
+          .orderBy("createdAt", "desc")
+          .limit(20)
+          .get();
       }
+    })
+    .then(data => {
+      userData.notifications = [];
+      data.forEach(doc => {
+        userData.notifications.push({
+          recipient: doc.data().recipient,
+          sender: doc.data().sender,
+          createdAt: doc.data().createdAt,
+          type: doc.data().type,
+          read: doc.data().read,
+          projectDiagramId: doc.data().projectDiagramId,
+          notificationId: doc.id
+        });
+      });
+      return response.json(userData);
     })
     .catch(err => {
       console.error(err);

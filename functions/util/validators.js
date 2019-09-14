@@ -36,8 +36,11 @@ exports.validateSignupData = data => {
 
 exports.validateLoginData = data => {
   let errors = {};
-
-  if (isEmpty(data.email)) errors.email = "Este campo no debe estar vacío";
+  if (isEmpty(data.email)) {
+    errors.email = "Este campo no debe estar vacío";
+  } else if (!isEmail(data.email)) {
+    errors.email = "Debe ingresar una dirección de correo electrónico válida";
+  }
   if (isEmpty(data.password))
     errors.password = "Este campo no debe estar vacío";
 
