@@ -27,7 +27,8 @@ const {
   getAuthenticatedUser,
   getObservers,
   signupWithGoogle,
-  passwordReset
+  passwordReset,
+  markNotificationsRead
 } = require("./handlers/users");
 
 //Project routes
@@ -55,6 +56,7 @@ app.get("/user", FBAuth, getAuthenticatedUser);
 app.get("/observers", FBAuth, getObservers);
 app.post("/signup/google", signupWithGoogle);
 app.post("/passwordReset", passwordReset);
+app.post("/notifications", FBAuth, markNotificationsRead);
 
 exports.api = functions.https.onRequest(app);
 
@@ -69,10 +71,11 @@ exports.createNotificationOnComment = functions.firestore
           return db.doc(`/notifications/${snapshot.id}`).set({
             createdAt: new Date().toISOString(),
             recipient: doc.data().diagramUserId,
-            sender: snapshot.data().userId,
+            sender: snapshot.data().firstNameUser,
             type: "comment",
             read: false,
-            projectDiagramId: doc.id
+            diagramId: doc.id,
+            projectId: snapshot.data().projectId
           });
         }
       })
@@ -97,10 +100,10 @@ exports.createNotificationOnProject = functions.firestore
             return db.collection("notifications").add({
               createdAt: new Date().toISOString(),
               recipient: observer,
-              sender: snapshot.data().projectUserId,
+              sender: snapshot.data().firstNameUser,
               type: "observer",
               read: false,
-              projectDiagramId: doc.id
+              projectId: doc.id
             });
           });
         }

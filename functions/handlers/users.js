@@ -192,8 +192,9 @@ exports.getAuthenticatedUser = (request, response) => {
           createdAt: doc.data().createdAt,
           type: doc.data().type,
           read: doc.data().read,
-          projectDiagramId: doc.data().projectDiagramId,
-          notificationId: doc.id
+          projectId: doc.data().projectId,
+          notificationId: doc.id,
+          diagramId: doc.data().diagramId
         });
       });
       return response.json(userData);
@@ -294,6 +295,23 @@ exports.passwordReset = (request, response) => {
       return response.json({
         message: "Mensaje enviado correctamente, por favor revisa tu correo"
       });
+    })
+    .catch(err => {
+      console.error(err);
+      return response.status(500).json({ error: err.code });
+    });
+};
+
+exports.markNotificationsRead = (request, response) => {
+  let batch = db.batch();
+  request.body.forEach(notificationId => {
+    const notification = db.doc(`/notifications/${notificationId}`);
+    batch.update(notification, { read: true });
+  });
+  batch
+    .commit()
+    .then(() => {
+      return response.json({ message: "Notification marked read" });
     })
     .catch(err => {
       console.error(err);

@@ -97,7 +97,8 @@ exports.commentOnDiagram = (request, response) => {
     userId: request.user.userId,
     userImage: request.user.imageUrl,
     firstNameUser: request.user.firstNameUser,
-    lastNameUser: request.user.lastNameUser
+    lastNameUser: request.user.lastNameUser,
+    projectId: request.params.projectId
   };
 
   db.doc(`/diagrams/${request.params.diagramId}`)

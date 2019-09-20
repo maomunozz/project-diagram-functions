@@ -92,7 +92,6 @@ exports.reduceProjectDetails = data => {
 
 exports.validateCreateDiagram = data => {
   let errors = {};
-
   if (isEmpty(data.diagramName))
     errors.diagramName = "Este campo no debe estar vacío";
   if (isEmpty(data.type)) errors.type = "Este campo no debe estar vacío";
